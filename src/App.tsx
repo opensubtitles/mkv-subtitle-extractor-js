@@ -77,10 +77,23 @@ function App() {
       const args = subtitles.flatMap((s: any) => {
         const lang = s.tags?.language || 'unk'
         const title = s.tags?.title || 'untitled'
-        const ext = s.codec_name === 'subrip' ? 'srt' : s.codec_name
         const baseName = file.name.replace(/\.(mkv|mp4)$/i, '')
-        return ['-i', `/data/${file.name}`, '-map', `0:${s.index}`, '-codec', 'copy',
-                `${baseName}_${lang}_${title}.${ext}`]
+
+        // MP4 subtitles (mov_text, etc.) need conversion to SRT
+        // MKV subtitles can be copied directly
+        const isMP4 = file.name.toLowerCase().endsWith('.mp4')
+        const needsConversion = isMP4 || s.codec_name === 'mov_text'
+
+        if (needsConversion) {
+          // Convert to SRT format
+          return ['-i', `/data/${file.name}`, '-map', `0:${s.index}`, '-c:s', 'srt',
+                  `${baseName}_${lang}_${title}.srt`]
+        } else {
+          // Copy directly
+          const ext = s.codec_name === 'subrip' ? 'srt' : s.codec_name
+          return ['-i', `/data/${file.name}`, '-map', `0:${s.index}`, '-codec', 'copy',
+                  `${baseName}_${lang}_${title}.${ext}`]
+        }
       })
 
       const files = await runWorker(`${baseUrl}ffmpeg-worker-mkve.js`, file, args, setProgressPercent)
