@@ -69,7 +69,7 @@ function App() {
       ])
 
       const subtitles = parsed.streams?.filter((s: any) => s.codec_type === 'subtitle')
-      if (!subtitles?.length) throw new Error('No subtitle tracks found')
+      if (!subtitles?.length) throw new Error('No subtitle tracks found in this video file')
 
       setProgress(`Extracting ${subtitles.length} subtitle(s)...`)
       setProgressPercent(10)
@@ -78,8 +78,9 @@ function App() {
         const lang = s.tags?.language || 'unk'
         const title = s.tags?.title || 'untitled'
         const ext = s.codec_name === 'subrip' ? 'srt' : s.codec_name
+        const baseName = file.name.replace(/\.(mkv|mp4)$/i, '')
         return ['-i', `/data/${file.name}`, '-map', `0:${s.index}`, '-codec', 'copy',
-                `${file.name.replace(/\.mkv$/i, '')}_${lang}_${title}.${ext}`]
+                `${baseName}_${lang}_${title}.${ext}`]
       })
 
       const files = await runWorker(`${baseUrl}ffmpeg-worker-mkve.js`, file, args, setProgressPercent)
@@ -93,7 +94,8 @@ function App() {
       const blob = await zip.generateAsync({ type: 'blob' })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
-      a.download = `${file.name.replace('.mkv', '')}_subtitles.zip`
+      const baseName = file.name.replace(/\.(mkv|mp4)$/i, '')
+      a.download = `${baseName}_subtitles.zip`
       a.click()
       URL.revokeObjectURL(a.href)
 
@@ -107,13 +109,14 @@ function App() {
   }, [])
 
   const handleFile = (file: File | undefined) => {
-    if (file?.name.toLowerCase().endsWith('.mkv')) {
+    const fileName = file?.name.toLowerCase()
+    if (fileName?.endsWith('.mkv') || fileName?.endsWith('.mp4')) {
       setStatus('idle')
       setProgress('')
       setProgressPercent(0)
       setTimeout(() => processFile(file), 100)
     } else {
-      alert('Please select a valid MKV file')
+      alert('Please select a valid MKV or MP4 file')
     }
   }
 
@@ -121,8 +124,8 @@ function App() {
 
   return (
     <div className="container">
-      <h1 className="title">MKV Subtitle Extractor</h1>
-      <p className="subtitle">Drop an MKV file to extract all subtitles</p>
+      <h1 className="title">Video Subtitle Extractor</h1>
+      <p className="subtitle">Drop an MKV or MP4 file to extract all subtitles</p>
 
       <div
         className={`drop-zone ${status} ${isDragging ? 'dragging' : ''}`}
@@ -147,7 +150,7 @@ function App() {
         ) : (
           <>
             <div className="status-icon">{icons[status]}</div>
-            <p className={`status-text ${status}`}>{progress || 'Drop MKV file or click to browse'}</p>
+            <p className={`status-text ${status}`}>{progress || 'Drop video file or click to browse'}</p>
             {status !== 'idle' && <p className="status-text">Click to process another file</p>}
           </>
         )}
@@ -155,7 +158,7 @@ function App() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".mkv"
+          accept=".mkv,.mp4"
           onChange={(e) => {
             handleFile(e.target.files?.[0])
             e.target.value = ''
