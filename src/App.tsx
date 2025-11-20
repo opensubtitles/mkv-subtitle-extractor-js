@@ -109,8 +109,9 @@ function App() {
   }, [])
 
   const handleFile = (file: File | undefined) => {
-    const fileName = file?.name.toLowerCase()
-    if (fileName?.endsWith('.mkv') || fileName?.endsWith('.mp4')) {
+    if (!file) return
+    const fileName = file.name.toLowerCase()
+    if (fileName.endsWith('.mkv') || fileName.endsWith('.mp4')) {
       setStatus('idle')
       setProgress('')
       setProgressPercent(0)
