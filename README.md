@@ -2,6 +2,10 @@
 
 Modern React-based web application for extracting all subtitle tracks from MKV files directly in your browser.
 
+## 🚀 [Live Demo](https://opensubtitles.github.io/mkv-subtitle-extractor-js/)
+
+Try it now: **https://opensubtitles.github.io/mkv-subtitle-extractor-js/**
+
 ## Features
 
 - **Browser-based** - No server upload required, everything runs locally
