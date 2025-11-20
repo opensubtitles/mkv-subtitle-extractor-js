@@ -63,7 +63,8 @@ function App() {
     setProgressPercent(0)
 
     try {
-      const parsed = await runWorker('/ffprobe-worker-mkve.js', file, [
+      const baseUrl = import.meta.env.BASE_URL
+      const parsed = await runWorker(`${baseUrl}ffprobe-worker-mkve.js`, file, [
         `/data/${file.name}`, '-print_format', 'json', '-show_streams', '-show_format'
       ])
 
@@ -81,7 +82,7 @@ function App() {
                 `${file.name.replace(/\.mkv$/i, '')}_${lang}_${title}.${ext}`]
       })
 
-      const files = await runWorker('/ffmpeg-worker-mkve.js', file, args, setProgressPercent)
+      const files = await runWorker(`${baseUrl}ffmpeg-worker-mkve.js`, file, args, setProgressPercent)
       if (!files?.length) throw new Error('Extraction failed')
 
       setProgress('Creating ZIP...')
