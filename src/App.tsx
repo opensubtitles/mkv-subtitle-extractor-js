@@ -183,7 +183,15 @@ function App() {
       </div>
 
       <div className="tech-stack">
-        <p>React 19 + TypeScript + Vite + FFmpeg.js</p>
+        <p>
+          <a href="https://react.dev" target="_blank" rel="noopener noreferrer">React 19</a>
+          {' + '}
+          <a href="https://www.typescriptlang.org" target="_blank" rel="noopener noreferrer">TypeScript</a>
+          {' + '}
+          <a href="https://vite.dev" target="_blank" rel="noopener noreferrer">Vite</a>
+          {' + '}
+          <a href="https://github.com/qgustavor/ffmpeg.js" target="_blank" rel="noopener noreferrer">FFmpeg.js</a>
+        </p>
       </div>
     </div>
   )
